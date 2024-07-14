@@ -1,7 +1,12 @@
 const express = require("express");
 const cors = require("cors");
+const knex = require("knex");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const bcrypt = req("bcrypt-nodejs");
 
-const sendMail = require("./controllers/sendMail")
+
+const register = require("./controllers/register");
 
 const app = express();
 app.use(cors());
@@ -9,11 +14,53 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.get("/",(req,res)=>{
-    res.json("Hello");
+
+const db = knex({
+    client: 'pg',
+    connection: {
+        host : '127.0.0.1',
+        port : 5432,
+        user : 'postgres',
+        password : '9987',
+        database : 'alive'
+    }
 });
 
-app.get("/sendmail",(req,res)=>{sendMail.sendMail(req,res)});
+passport.use(new LocalStrategy(function verify(username,password,cb){
+    db.select("*")
+        .from("users")
+        .where({username:username})
+        .first()
+        .then(user => {
+            if (!user){
+                return cb(null,false,{messge:"Incorrect username"});
+            }
+            bcrypt.compare(password, user[0].password, function(err, isMatch) {
+                if (err) {
+                  return cb(err);
+                }
+                if (!isMatch) {
+                  return cb(null, false, { message: 'Incorrect password.' });
+                }
+                // If authentication succeeds, return user object
+                return cb(null, user);
+              });
+        })
+        .catch(err => cb(err));
+}));
+
+
+app.get("/",(req,res)=>{
+    db.select("*")
+        .from("users")
+        .then(users => res.json(users))
+        .catch(error => {
+            res.status(400).json("Error occured fetching db");
+            console.log(error);
+        });
+});
+
+app.post("/register",(req,res)=>{register.register(req,res)});
 
 app.listen(3000,() => {
     console.log(`App is running on port 3000`);
