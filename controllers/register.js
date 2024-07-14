@@ -1,7 +1,7 @@
 const register = (req,res) => {
-
+    res.json("Hello");
 }
 
-module.expotrs = {
+module.exports = {
     register
 }
