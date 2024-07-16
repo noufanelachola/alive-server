@@ -1,9 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const knex = require("knex");
-const passport = require("passport");
-const LocalStrategy = require("passport-local");
-const bcrypt = req("bcrypt-nodejs");
+const bcrypt = require("bcrypt-nodejs");
 
 
 const register = require("./controllers/register");
@@ -25,29 +23,6 @@ const db = knex({
         database : 'alive'
     }
 });
-
-passport.use(new LocalStrategy(function verify(username,password,cb){
-    db.select("*")
-        .from("users")
-        .where({username:username})
-        .first()
-        .then(user => {
-            if (!user){
-                return cb(null,false,{messge:"Incorrect username"});
-            }
-            bcrypt.compare(password, user[0].password, function(err, isMatch) {
-                if (err) {
-                  return cb(err);
-                }
-                if (!isMatch) {
-                  return cb(null, false, { message: 'Incorrect password.' });
-                }
-                // If authentication succeeds, return user object
-                return cb(null, user);
-              });
-        })
-        .catch(err => cb(err));
-}));
 
 
 app.get("/",(req,res)=>{
