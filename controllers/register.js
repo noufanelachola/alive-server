@@ -1,5 +1,6 @@
 const register = (req,res) => {
-    res.json("Hello");
+    res.json(req.body);
+    console.log(req.body)
 }
 
 module.exports = {
