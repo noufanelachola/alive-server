@@ -35,7 +35,7 @@ app.get("/",(req,res)=>{
         });
 });
 
-app.post("/register",(req,res)=>{register.register(req,res)});
+app.post("/register",(req,res)=>{register.register(req,res,db,bcrypt)});
 
 app.listen(3000,() => {
     console.log(`App is running on port 3000`);
