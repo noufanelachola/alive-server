@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt-nodejs");
 
 
 const register = require("./controllers/register");
+const login = require("./controllers/login");
 
 const app = express();
 app.use(cors());
@@ -36,6 +37,7 @@ app.get("/",(req,res)=>{
 });
 
 app.post("/register",(req,res)=>{register.register(req,res,db,bcrypt)});
+app.post("/login",(req,res)=>{login.login(req,res,db,bcrypt)});
 
 app.listen(3000,() => {
     console.log(`App is running on port 3000`);
